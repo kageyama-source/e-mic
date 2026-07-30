@@ -26,11 +26,13 @@ jobs:
         run: |
           cd e_mic_android
           flutter create .
-          # Fix minSdkVersion for record_android package in both Groovy and Kotlin DSL
+          # Fix minSdkVersion and disable minification in both Groovy and Kotlin DSL
           if [ -f android/app/build.gradle.kts ]; then
             sed -i 's/minSdk =.*/minSdk = 23/g' android/app/build.gradle.kts
+            sed -i 's/isMinifyEnabled = true/isMinifyEnabled = false/g' android/app/build.gradle.kts || true
           elif [ -f android/app/build.gradle ]; then
             sed -i 's/minSdkVersion.*/minSdkVersion 23/g' android/app/build.gradle
+            sed -i 's/minifyEnabled true/minifyEnabled false/g' android/app/build.gradle || true
           fi
           cat <<EOF > android/app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -67,7 +69,7 @@ jobs:
       - name: Install dependencies
         run: cd e_mic_android && flutter pub get
       - name: Build APK
-        run: cd e_mic_android && flutter build apk --release --no-shrink
+        run: cd e_mic_android && flutter build apk --release
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
