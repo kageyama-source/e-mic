@@ -9,9 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  record: ^5.0.5
-  permission_handler: ^11.0.1
-  shared_preferences: ^2.2.1
+  record: ^5.2.0
+  permission_handler: ^11.3.1
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
