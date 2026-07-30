@@ -1,0 +1,86 @@
+name: Build E-MIC
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+          channel: 'stable'
+      - name: Install dependencies
+        run: cd e_mic_android && flutter pub get
+      - name: Build APK
+        run: cd e_mic_android && flutter build apk --release
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: E-MIC-Android-APK
+          path: e_mic_android/build/app/outputs/flutter-apk/app-release.apk
+
+  build-windows:
+    name: Build Windows Desktop Client
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          cd e_mic_desktop
+          python -m pip install --upgrade pip
+          pip install pyaudio sounddevice numpy customtkinter pyinstaller
+      - name: Build with PyInstaller
+        run: |
+          cd e_mic_desktop
+          pyinstaller --noconfirm --onedir --windowed --name "E-MIC-Server" main.py
+      - name: Upload Windows Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: E-MIC-Windows
+          path: e_mic_desktop/dist/E-MIC-Server/
+
+  build-linux:
+    name: Build Linux Desktop Client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y portaudio19-dev python3-tk
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install Python dependencies
+        run: |
+          cd e_mic_desktop
+          python -m pip install --upgrade pip
+          pip install pyaudio sounddevice numpy customtkinter pyinstaller
+      - name: Build with PyInstaller
+        run: |
+          cd e_mic_desktop
+          pyinstaller --noconfirm --onedir --windowed --name "E-MIC-Server-Linux" main.py
+      - name: Upload Linux Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: E-MIC-Linux
+          path: e_mic_desktop/dist/E-MIC-Server-Linux/
