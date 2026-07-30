@@ -27,6 +27,8 @@ jobs:
         run: |
           cd e_mic_android
           flutter create .
+          # Fix minSdkVersion for record_android package
+          sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 23/g' android/app/build.gradle
           cat <<EOF > android/app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.RECORD_AUDIO" />
