@@ -64,7 +64,7 @@ jobs:
       - name: Install dependencies
         run: cd e_mic_android && flutter pub get
       - name: Build APK
-        run: cd e_mic_android && flutter build apk --release
+        run: cd e_mic_android && flutter build apk --release --no-shrink
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
